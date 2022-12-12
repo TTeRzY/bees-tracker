@@ -3,6 +3,7 @@ package com.beestracker.views.apiaries;
 import com.beestracker.data.entity.Apiary;
 import com.beestracker.data.service.ApiaryService;
 import com.beestracker.views.MainLayout;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -43,6 +45,13 @@ public class ApiariesView extends VerticalLayout {
         grid.addColumn(Apiary::getApiaryId).setHeader("Рег. номер на пчелин");
         grid.addColumn(Apiary::getName).setHeader("Име");
         grid.addColumn(Apiary::getAddress).setHeader("Адрес");
+
+        TextField textField = new TextField();
+        textField.getElement().setAttribute("aria-label", "search");
+        textField.setPlaceholder("Search");
+        textField.setClearButtonVisible(true);
+        textField.setPrefixComponent(VaadinIcon.SEARCH.create());
+        add(textField);
 
         // Борй кошери към даден пчелин
         //grid.addColumn(Apiary::getBeeHives).setHeader("Брой кошери");
