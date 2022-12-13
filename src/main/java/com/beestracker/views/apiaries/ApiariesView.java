@@ -3,28 +3,22 @@ package com.beestracker.views.apiaries;
 import com.beestracker.data.entity.Apiary;
 import com.beestracker.data.service.ApiaryService;
 import com.beestracker.views.MainLayout;
-import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.dataview.GridLazyDataView;
-import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 
 import javax.annotation.security.PermitAll;
-import java.util.List;
 
 @PageTitle("Apiaries")
 @Route(value = "apiaries", layout = MainLayout.class)
@@ -32,7 +26,6 @@ import java.util.List;
 public class ApiariesView extends VerticalLayout {
 
     private final ApiaryService apiaryService;
-    private Button addButton;
     private Button editButton;
     private Button deleteButton;
     private final Grid<Apiary> grid;
@@ -46,15 +39,46 @@ public class ApiariesView extends VerticalLayout {
         grid.addColumn(Apiary::getName).setHeader("Име");
         grid.addColumn(Apiary::getAddress).setHeader("Адрес");
 
-        TextField textField = new TextField();
-        textField.getElement().setAttribute("aria-label", "search");
-        textField.setPlaceholder("Search");
-        textField.setClearButtonVisible(true);
-        textField.setPrefixComponent(VaadinIcon.SEARCH.create());
-        add(textField);
+        TextField searchName = new TextField();
+        searchName.getElement().setAttribute("aria-label", "Име");
+        searchName.setPlaceholder("Име");
+        searchName.setClearButtonVisible(true);
+        searchName.setPrefixComponent(VaadinIcon.SEARCH.create());
+        searchName.addValueChangeListener(event -> grid.setItems(query -> apiaryService.list(
+                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                .stream()
+                .filter(item -> {
+                    final String name = item.getName().toLowerCase();
+                    final String searchTerm = event.getValue().trim().toLowerCase();
+                    if (StringUtils.isNotBlank(searchTerm))
+                    {
+                        return name.contains(searchTerm);
+                    }
+                    return true;
+                })
+        ));
 
-        // Борй кошери към даден пчелин
-        //grid.addColumn(Apiary::getBeeHives).setHeader("Брой кошери");
+        TextField searchAddress = new TextField();
+        searchAddress.getElement().setAttribute("aria-label", "Адрес");
+        searchAddress.setPlaceholder("Адрес");
+        searchAddress.setClearButtonVisible(true);
+        searchAddress.setPrefixComponent(VaadinIcon.SEARCH.create());
+        searchAddress.addValueChangeListener(event -> grid.setItems(query -> apiaryService.list(
+                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                .stream()
+                .filter(item -> {
+                    final String address = item.getAddress().toLowerCase();
+                    final String searchTerm = event.getValue().trim().toLowerCase();
+                    if (StringUtils.isNotBlank(searchTerm))
+                    {
+                        return address.contains(searchTerm);
+                    }
+                    return true;
+                })
+        ));
+
+        final HorizontalLayout searchFields = new HorizontalLayout(searchName, searchAddress);
+        add(searchFields);
 
         refreshGridData();
         grid.asSingleSelect().addValueChangeListener(l -> {
@@ -67,7 +91,7 @@ public class ApiariesView extends VerticalLayout {
 
     private void addButtonsLayout()
     {
-        addButton = new Button("Добави", l -> {
+        Button addButton = new Button("Добави", l -> {
             final Apiary apiary = new Apiary();
             openApiaryForm(apiary);
         });
