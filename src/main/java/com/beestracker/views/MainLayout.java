@@ -73,19 +73,19 @@ public class MainLayout extends AppLayout {
         AppNav nav = new AppNav();
 
         if (accessChecker.hasAccess(HomeView.class)) {
-            nav.addItem(new AppNavItem("Home", HomeView.class, "la la-home"));
+            nav.addItem(new AppNavItem("Начало", HomeView.class, "la la-home"));
 
         }
         if (accessChecker.hasAccess(ApiariesView.class)) {
-            nav.addItem(new AppNavItem("Apiaries", ApiariesView.class, "la la-layer-group"));
+            nav.addItem(new AppNavItem("Пчелини", ApiariesView.class, "la la-layer-group"));
 
         }
         if (accessChecker.hasAccess(BeehivesView.class)) {
-            nav.addItem(new AppNavItem("Beehives", BeehivesView.class, "lab la-forumbee"));
+            nav.addItem(new AppNavItem("Кошери", BeehivesView.class, "lab la-forumbee"));
 
         }
         if (accessChecker.hasAccess(NotesView.class)) {
-            nav.addItem(new AppNavItem("Notes", NotesView.class, "la la-sticky-note"));
+            nav.addItem(new AppNavItem("Бележки", NotesView.class, "la la-sticky-note"));
 
         }
 

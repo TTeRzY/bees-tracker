@@ -54,6 +54,7 @@ public class BeehivesView extends VerticalLayout {
             final BeeHive value = l.getValue();
             editButton.setEnabled(value != null);
             deleteButton.setEnabled(value != null);
+
         });
         add(grid);
     }

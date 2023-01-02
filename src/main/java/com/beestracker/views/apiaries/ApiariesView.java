@@ -1,7 +1,9 @@
 package com.beestracker.views.apiaries;
 
 import com.beestracker.data.entity.Apiary;
+import com.beestracker.data.entity.BeeHive;
 import com.beestracker.data.service.ApiaryService;
+import com.beestracker.data.service.BeeHiveService;
 import com.beestracker.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

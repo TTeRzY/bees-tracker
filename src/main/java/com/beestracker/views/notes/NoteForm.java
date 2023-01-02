@@ -1,8 +1,8 @@
-package com.beestracker.views.beehives;
+package com.beestracker.views.notes;
 
-import com.beestracker.data.entity.Apiary;
 import com.beestracker.data.entity.BeeHive;
-import com.beestracker.data.service.ApiaryService;
+import com.beestracker.data.entity.Note;
+import com.beestracker.data.service.BeeHiveService;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
@@ -18,26 +18,24 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import org.springframework.data.domain.PageRequest;
 
 
-public class BeeHiveForm extends VerticalLayout {
-    private final TextField beeHiveId = new TextField("Идентификатор на кошер");
-    private final ComboBox<Apiary> apiary = new ComboBox<>("Пчелини");
-    private final TextField model = new TextField("Модел");
-    private final TextField frames = new TextField("Брой рамки");
-    private final TextField strength = new TextField("Сила");
-    private final DatePicker registerDate = new DatePicker("Дата");
+public class NoteForm extends VerticalLayout {
+    private final DatePicker addedDate = new DatePicker("Дата");
+    private final ComboBox<BeeHive> beeHive = new ComboBox<>("Избери кошер");
+    private final TextField title = new TextField("Заглавие");
+    private final TextField description = new TextField("Описание");
     private boolean saved;
 
-    private final BeeHive beeHive;
-    private final BeanValidationBinder<BeeHive> binder = new BeanValidationBinder<>(BeeHive.class);
+    private final Note note;
+    private final BeanValidationBinder<Note> binder = new BeanValidationBinder<>(Note.class);
     private Button cancel;
     private Button save;
 
-    private final ApiaryService apiaryService;
+    private final BeeHiveService beeHiveService;
 
 
-    public BeeHiveForm(BeeHive beeHive, ApiaryService apiaryService) {
-        this.beeHive = beeHive;
-        this.apiaryService = apiaryService;
+    public NoteForm(Note note, BeeHiveService beeHiveService) {
+        this.note = note;
+        this.beeHiveService = beeHiveService;
         init();
     }
 
@@ -45,19 +43,17 @@ public class BeeHiveForm extends VerticalLayout {
     private void init() {
         setSizeFull();
         final FormLayout form = new FormLayout();
-        form.add(beeHiveId);
-        apiary.setItems(query -> apiaryService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+        form.add(addedDate);
+        beeHive.setItems(query -> beeHiveService
+                .list(PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream()
         );
-        apiary.setItemLabelGenerator(Apiary::getName);
-        form.add(apiary);
-        form.add(model);
-        form.add(frames);
-        form.add(strength);
-        form.add(registerDate);
+        beeHive.setItemLabelGenerator(BeeHive::getBeeHiveId);
+        form.add(beeHive);
+        form.add(title);
+        form.add(description);
         binder.bindInstanceFields(this);
-        binder.readBean(this.beeHive);
+        binder.readBean(this.note);
         HorizontalLayout buttons = configureButtons();
         add(form, buttons);
     }
@@ -67,7 +63,7 @@ public class BeeHiveForm extends VerticalLayout {
         save = new Button("Създай", l -> {
             if (binder.isValid()) {
                 try {
-                    binder.writeBean(beeHive);
+                    binder.writeBean(note);
                     saved = true;
                 } catch (ValidationException e) {
                     e.printStackTrace();
