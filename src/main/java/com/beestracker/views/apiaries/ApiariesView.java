@@ -22,7 +22,7 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.annotation.security.PermitAll;
 
-@PageTitle("Apiaries")
+@PageTitle("Пчелини")
 @Route(value = "apiaries", layout = MainLayout.class)
 @PermitAll
 public class ApiariesView extends VerticalLayout {

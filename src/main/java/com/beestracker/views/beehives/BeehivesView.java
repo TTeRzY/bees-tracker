@@ -2,8 +2,10 @@ package com.beestracker.views.beehives;
 
 import com.beestracker.data.entity.Apiary;
 import com.beestracker.data.entity.BeeHive;
+import com.beestracker.data.entity.Note;
 import com.beestracker.data.service.ApiaryService;
 import com.beestracker.data.service.BeeHiveService;
+import com.beestracker.data.service.NoteService;
 import com.beestracker.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -18,22 +20,38 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import org.springframework.data.domain.PageRequest;
 
 import javax.annotation.security.PermitAll;
+import java.util.List;
+import java.util.Objects;
 
-@PageTitle("Beehives")
+@PageTitle("Кошери")
 @Route(value = "beehives", layout = MainLayout.class)
 @PermitAll
 public class BeehivesView extends VerticalLayout {
     private final BeeHiveService beeHiveService;
     private final ApiaryService apiaryService;
+    private final NoteService noteService;
     private Button addButton;
     private Button editButton;
     private Button deleteButton;
-    private final Grid<BeeHive> grid;
-    public BeehivesView(BeeHiveService beeHiveService, ApiaryService apiaryService) {
+    private Grid<BeeHive> grid;
+    private final Grid<Note> gridNote;
+    public BeehivesView(BeeHiveService beeHiveService, ApiaryService apiaryService, NoteService noteService) {
         this.beeHiveService = beeHiveService;
         this.apiaryService = apiaryService;
+        this.noteService = noteService;
 
         addButtonsLayout();
+        addBeeHiveGrid();
+        gridNote = new Grid<>(Note.class, false);
+        gridNote.addColumn(Note::getAddedDate).setHeader("Дата");
+        gridNote.addColumn(Note::getTitle).setHeader("Заглавие");
+        gridNote.addColumn(Note::getDescription).setHeader("Описание");
+        H3 noteTitle = new H3("Бележки");
+        add(noteTitle);
+        add(gridNote);
+    }
+
+    private void addBeeHiveGrid() {
         grid = new Grid<>(BeeHive.class, false);
         grid.addColumn(BeeHive::getBeeHiveId).setHeader("Рег. номер на кошер");
         grid.addColumn(beeHive -> {
@@ -54,7 +72,15 @@ public class BeehivesView extends VerticalLayout {
             final BeeHive value = l.getValue();
             editButton.setEnabled(value != null);
             deleteButton.setEnabled(value != null);
-
+            gridNote.setEnabled(value != null);
+            if (value != null) {
+                gridNote.setItems(query -> noteService
+                        .list(PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                        .stream().filter(item -> Objects.equals(item.getBeeHive().getBeeHiveId(), value.getBeeHiveId()))
+                );
+            } else {
+                gridNote.setItems();
+            }
         });
         add(grid);
     }
@@ -112,8 +138,8 @@ public class BeehivesView extends VerticalLayout {
     }
 
     private void refreshGridData() {
-        grid.setItems(query -> beeHiveService.list(
-                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+        grid.setItems(query -> beeHiveService
+                .list(PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream()
         );
     }

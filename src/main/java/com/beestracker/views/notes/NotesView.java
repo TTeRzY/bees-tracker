@@ -19,7 +19,7 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.annotation.security.PermitAll;
 
-@PageTitle("Notes")
+@PageTitle("Бележки")
 @Route(value = "notes", layout = MainLayout.class)
 @PermitAll
 public class NotesView extends VerticalLayout {

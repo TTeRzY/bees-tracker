@@ -73,7 +73,7 @@ public class MainLayout extends AppLayout {
         AppNav nav = new AppNav();
 
         if (accessChecker.hasAccess(HomeView.class)) {
-            nav.addItem(new AppNavItem("Начало", HomeView.class, "la la-home"));
+            nav.addItem(new AppNavItem("Табло", HomeView.class, "la la-home"));
 
         }
         if (accessChecker.hasAccess(ApiariesView.class)) {

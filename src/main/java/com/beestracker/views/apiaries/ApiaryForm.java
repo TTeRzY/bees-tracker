@@ -48,7 +48,7 @@ public class ApiaryForm extends VerticalLayout
 
     private HorizontalLayout configureButtons()
     {
-        save = new Button("Създай", l -> {
+        save = new Button("Запази", l -> {
             if (binder.isValid())
             {
                 try
